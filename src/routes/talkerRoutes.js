@@ -15,6 +15,11 @@ const readTalkers = async () => {
   }
 };
 
+const searchById = async (id) => {
+  const allTalkers = await readTalkers();
+  return allTalkers.filter((elem) => elem.id === id);
+};
+
 talker.get('/', async (_req, res, next) => {
   try {
     const result = await readTalkers();
@@ -22,6 +27,18 @@ talker.get('/', async (_req, res, next) => {
   } catch (err) {
     console.log('error -> router get all talkers');
     next(err);
+  }
+});
+
+talker.get('/:id', async (req, res, next) => {
+  const { id } = req.params;
+  try {
+    const result = await searchById(Number(id));
+    if (result.length > 0) return res.status(200).json(...result);
+    return res.status(404).json({ message: 'Pessoa palestrante não encontrada' });
+  } catch (error) {
+    console.log('error');
+    next(error);
   }
 });
 
