@@ -1,7 +1,10 @@
 const express = require('express');
 const crypto = require('crypto');
+const validationMiddleware = require('../middlewares/validationMiddleware');
 
 const login = express.Router();
+
+login.use(validationMiddleware);
 
 login.post('/', (req, res) => {
   const { email, password } = req.body;
