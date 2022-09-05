@@ -1,6 +1,10 @@
 const express = require('express');
 const fs = require('fs').promises;
 const { join } = require('path');
+const authMiddleware = require('../middlewares/authMiddleware');
+const authAge = require('../middlewares/authAge');
+const authName = require('../middlewares/authName');
+const { authWatched, authRate, authTalk } = require('../middlewares/authTalk');
 
 const talker = express.Router();
 
@@ -13,6 +17,11 @@ const readTalkers = async () => {
   } catch (error) {
     return [];
   }
+};
+
+const postTalker = async (newPeople) => {
+  const path = '../talker.json';
+  await fs.writeFile(join(__dirname, path), JSON.stringify(newPeople));
 };
 
 const searchById = async (id) => {
@@ -40,6 +49,18 @@ talker.get('/:id', async (req, res, next) => {
     console.log('error');
     next(error);
   }
+});
+
+talker.post('/', authMiddleware, authName, authAge, authTalk, authWatched, authRate, 
+  async (req, res) => {
+  const person = req.body;
+  const people = await readTalkers();
+  console.log(people);
+  console.log({ ...person, id: people.length + 1 });
+  people.push({ ...person, id: people.length + 1 });
+  console.log(people);
+  await postTalker(people);
+  return res.status(201).json({ ...person, id: people.length });
 });
 
 module.exports = talker;
