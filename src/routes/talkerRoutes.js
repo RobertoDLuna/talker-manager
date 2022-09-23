@@ -50,6 +50,19 @@ talker.get('/:id', async (req, res, next) => {
   }
 });
 
+talker.get('/search', authMiddleware, async (req, res) => {
+  const { q } = req.query;
+  const people = await readTalkers();
+
+  if (!q) {
+    return res.status(200).json(people);
+  }
+
+  const filteredPeople = people.filter((person) => person.name.includes(q));
+
+  return res.status(200).json(filteredPeople);
+});
+
 talker.post('/', authMiddleware, authName, authAge, authTalk, authWatched, authRate, 
   async (req, res) => {
   const person = req.body;
