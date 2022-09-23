@@ -18,15 +18,14 @@ const readTalkers = async () => {
     return [];
   }
 };
+const searchById = async (id) => {
+  const allTalkers = await readTalkers();
+  return allTalkers.filter((elem) => elem.id === id);
+};
 
 const postTalker = async (newPeople) => {
   const path = '../talker.json';
   await fs.writeFile(join(__dirname, path), JSON.stringify(newPeople));
-};
-
-const searchById = async (id) => {
-  const allTalkers = await readTalkers();
-  return allTalkers.filter((elem) => elem.id === id);
 };
 
 talker.get('/', async (_req, res, next) => {
@@ -55,12 +54,30 @@ talker.post('/', authMiddleware, authName, authAge, authTalk, authWatched, authR
   async (req, res) => {
   const person = req.body;
   const people = await readTalkers();
-  console.log(people);
-  console.log({ ...person, id: people.length + 1 });
-  people.push({ ...person, id: people.length + 1 });
+  const newPerson = { ...person, id: people.length += 1 };
+  people.push(newPerson);
+  await postTalker(people);
+  return res.status(201).json(newPerson);
+});
+
+talker.put('/:id', authMiddleware, authName, authAge, authTalk, authWatched, authRate, 
+async (req, res) => {
+  const { id } = req.params;
+  const { name, age, talk } = req.body;
+  const people = await readTalkers();
+  const peopleUpdated = { name, age, talk, id: Number(id) };
+
+  for (let i = 0; i < people.length; i += 1) {
+    if (people[i].id === Number(id)) {
+      people[i].name = name;
+      people[i].age = age;
+      people[i].talk = talk;
+    }
+  }
+
   console.log(people);
   await postTalker(people);
-  return res.status(201).json({ ...person, id: people.length });
+  return res.status(200).json(peopleUpdated);
 });
 
 module.exports = talker;
