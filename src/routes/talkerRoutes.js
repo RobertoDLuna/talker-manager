@@ -31,7 +31,6 @@ const postTalker = async (newPeople) => {
 talker.get('/search', authMiddleware, async (req, res) => {
   const { q } = req.query;
   const people = await readTalkers();
-  console.log(people);
 
   if (!q) {
     return res.status(200).json(people);
