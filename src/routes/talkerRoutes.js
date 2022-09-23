@@ -80,4 +80,14 @@ async (req, res) => {
   return res.status(200).json(peopleUpdated);
 });
 
+talker.delete('/:id', authMiddleware, 
+async (req, res) => {
+  const { id } = req.params;
+  const people = await readTalkers();
+  const newPeople = people.filter((person) => person.id === Number(id));
+
+  await postTalker(newPeople);
+  return res.status(204).end();
+});
+
 module.exports = talker;
