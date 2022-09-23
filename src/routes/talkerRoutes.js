@@ -28,6 +28,20 @@ const postTalker = async (newPeople) => {
   await fs.writeFile(join(__dirname, path), JSON.stringify(newPeople));
 };
 
+talker.get('/search', authMiddleware, async (req, res) => {
+  const { q } = req.query;
+  const people = await readTalkers();
+  console.log(people);
+
+  if (!q) {
+    return res.status(200).json(people);
+  }
+
+  const filteredPeople = people.filter((person) => person.name.includes(q));
+
+  return res.status(200).json(filteredPeople);
+});
+
 talker.get('/', async (_req, res, next) => {
   try {
     const result = await readTalkers();
@@ -48,19 +62,6 @@ talker.get('/:id', async (req, res, next) => {
     console.log('error');
     next(error);
   }
-});
-
-talker.get('/search', authMiddleware, async (req, res) => {
-  const { q } = req.query;
-  const people = await readTalkers();
-
-  if (!q) {
-    return res.status(200).json(people);
-  }
-
-  const filteredPeople = people.filter((person) => person.name.includes(q));
-
-  return res.status(200).json(filteredPeople);
 });
 
 talker.post('/', authMiddleware, authName, authAge, authTalk, authWatched, authRate, 
