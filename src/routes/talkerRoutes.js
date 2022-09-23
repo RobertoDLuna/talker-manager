@@ -54,7 +54,7 @@ talker.post('/', authMiddleware, authName, authAge, authTalk, authWatched, authR
   async (req, res) => {
   const person = req.body;
   const people = await readTalkers();
-  const newPerson = { ...person, id: people.length += 1 };
+  const newPerson = { ...person, id: people.length + 1 };
   people.push(newPerson);
   await postTalker(people);
   return res.status(201).json(newPerson);
